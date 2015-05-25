@@ -72,6 +72,7 @@ class SlackWebhookSender {
         if( $curl = curl_init() ) {
             curl_setopt($curl, CURLOPT_URL, $this->slackHookUrl);
             curl_setopt($curl, CURLOPT_RETURNTRANSFER,true);
+            curl_setopt($curl, CURLOPT_TIMEOUT, 10);
             curl_setopt($curl, CURLOPT_POST, true);
             curl_setopt($curl, CURLOPT_POSTFIELDS, 'payload='.$slack_request);
             $out = curl_exec($curl);

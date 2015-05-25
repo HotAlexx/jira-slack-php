@@ -23,6 +23,7 @@ class JiraSlackIntegration {
         'SITES' => 'sites',
         'CMS' => 'cms',
         'FCRM' => 'fin_crm',
+        'RAZ' => 'raz',
     );
 
     /**
@@ -31,6 +32,16 @@ class JiraSlackIntegration {
     public $jiraUsersToSlack=array(
         'admin' => 'hotalex',
         'dimon9107' => 'dvm',
+        'alexeyshim' => 'alexeyshim',
+        'eremin' => 'eremin',
+        'kovalev' => 'kovalev',
+        'andrei.kalachev' => 'kalachev',
+        'helgaselivers' => 'helgaselivers',
+        'juliapo' => 'juliapo',
+        'pbalin' => 'pbalin',
+        'rash012' => 'rash012',
+        'yana-bony' => 'yana',
+        'Ymka' => 'ymka',
     );
 
     /**
@@ -49,7 +60,10 @@ class JiraSlackIntegration {
         {
 
             $slaskWebhookSender=new SlackWebhookSender($this->slackHookUrl);
-            $channel=$this->getDestinationChannel();
+
+            // Get destination channel
+            $channel=$this->getDestinationChannel($this->jiraHookReceiver->data->issue->fields->project->key);
+
             switch($this->jiraHookReceiver->data->webhookEvent)
             {
                 case 'jira:issue_created':
@@ -66,6 +80,15 @@ class JiraSlackIntegration {
 
             }
 
+            // Check new assign
+            $new_assign_jirauser=$this->isNewAssign($this->jiraHookReceiver->data);
+
+            if($new_assign_jirauser && $slackUser=$this->getDestinationUser($new_assign_jirauser))
+            {
+                if(!$slaskWebhookSender->directMessage($slackUser, 'jira-updates', '', $this->templateAssign($this->jiraHookReceiver->data)))
+                    $this->log($slaskWebhookSender->error);
+            }
+
 
         }
         else
@@ -75,16 +98,48 @@ class JiraSlackIntegration {
 
     }
 
-    /** Gets channel by Jira Project key
-     * @return bool False if channel doesn't exist
+    /**
+     * @param $project_key
+     * @return bool Slack channel or false if not exist
      */
-    protected function getDestinationChannel()
+    protected function getDestinationChannel($project_key)
     {
-        $project_key=$this->jiraHookReceiver->data->issue->fields->project->key;
         if(isset($this->projectsToChannels[$project_key]))
             return $this->projectsToChannels[$project_key];
         else
             return false;
+    }
+
+    /**
+     * @param $jira_user
+     * @return bool Slack user or false if not exist
+     */
+    protected function getDestinationUser($jira_user)
+    {
+        if(isset($this->jiraUsersToSlack[$jira_user]))
+            return $this->jiraUsersToSlack[$jira_user];
+        else
+            return false;
+    }
+
+    protected function isNewAssign($data)
+    {
+        $assignee_key='';
+        if($data->webhookEvent == 'jira:issue_created' && isset($data->issue->fields->assignee))
+            $assignee_key=$data->issue->fields->assignee->key;
+        elseif($data->webhookEvent == 'jira:issue_updated')
+        {
+            $changelog=$data->changelog->items;
+            foreach($changelog as $item)
+            {
+                if($item->field == 'assignee')
+                    $assignee_key=$item->to;
+            }
+        }
+        else
+            return false;
+
+        return $assignee_key;
     }
 
     /** Logger
@@ -95,15 +150,14 @@ class JiraSlackIntegration {
         $date=date('d.m.Y H:i:s');
         file_put_contents($this->logfile, "[".$date."] ".$message."\n", FILE_APPEND);
     }
-
-    /*
+/*
     protected function getDump($var)
     {
         ob_start();
         var_dump($var);
         return ob_get_clean();
     }
-    */
+*/
 
     /** Template for create issue event
      * @param $data Jira Hook data
@@ -144,6 +198,25 @@ class JiraSlackIntegration {
     protected function templateIssueDeleted($data)
     {
         $pretext="<https://plusonedev.atlassian.net/secure/ViewProfile.jspa?name=".$data->user->key."|".$data->user->displayName."> deleted a ".$data->issue->fields->issuetype->name." <https://plusonedev.atlassian.net/browse/".$data->issue->key."|".$data->issue->key.">";
+
+        return '"attachments": [
+                        {
+                            "color": "#36a64f",
+                            "pretext": "'.$pretext.'",
+                            "fields": [
+                                {
+                                    "title": "Summary",
+                                    "value": "'.$data->issue->fields->summary.'",
+                                    "short": false
+                                }
+                            ]
+                        }
+                ]';
+    }
+
+    protected function templateAssign($data)
+    {
+        $pretext="<https://plusonedev.atlassian.net/secure/ViewProfile.jspa?name=".$data->user->key."|".$data->user->displayName."> assigned to you a ".$data->issue->fields->issuetype->name." <https://plusonedev.atlassian.net/browse/".$data->issue->key."|".$data->issue->key.">";
 
         return '"attachments": [
                         {
