@@ -22,6 +22,7 @@ class JiraSlackIntegration {
         'SMAR' => 'navigator',
         'SITES' => 'sites',
         'CMS' => 'cms',
+        'FCRM' => 'fin-crm',
     );
 
     /**
