@@ -42,6 +42,7 @@ class JiraSlackIntegration {
         'rash012' => 'rash012',
         'yana-bony' => 'yana',
         'Ymka' => 'ymka',
+        'xpasha' => 'khramkin',
     );
 
     /**
