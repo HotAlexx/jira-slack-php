@@ -31,7 +31,11 @@ class JiraSlackIntegration {
         'admin' => 'hotalex',
         'dimon9107' => 'dvm',
     );
-    protected $logfile="logs/recieved.log";
+
+    /**
+     * @var string logfile. Please create this directory and set writing permissions!
+     */
+    protected $logfile="logs/errors.log";
 
     /**
      * Runs integration
@@ -48,13 +52,16 @@ class JiraSlackIntegration {
             switch($this->jiraHookReceiver->data->webhookEvent)
             {
                 case 'jira:issue_created':
-                    $slaskWebhookSender->sendToChannel($channel, 'jira-updates', '', $this->templateIssueCreated($this->jiraHookReceiver->data));
+                    if(!$slaskWebhookSender->sendToChannel($channel, 'jira-updates', '', $this->templateIssueCreated($this->jiraHookReceiver->data)))
+                        $this->log($slaskWebhookSender->error);
                     break;
                 case 'jira:issue_deleted':
-                    $slaskWebhookSender->sendToChannel($channel, 'jira-updates', '', $this->templateIssueDeleted($this->jiraHookReceiver->data));
+                    if(!$slaskWebhookSender->sendToChannel($channel, 'jira-updates', '', $this->templateIssueDeleted($this->jiraHookReceiver->data)))
+                        $this->log($slaskWebhookSender->error);
                     break;
                 default:
-                    $slaskWebhookSender->sendToChannel($channel, 'jira-updates', '', $this->templateIssueUpdated($this->jiraHookReceiver->data));
+                    if(!$slaskWebhookSender->sendToChannel($channel, 'jira-updates', '', $this->templateIssueUpdated($this->jiraHookReceiver->data)))
+                        $this->log($slaskWebhookSender->error);
 
             }
 
@@ -64,6 +71,7 @@ class JiraSlackIntegration {
         {
             $this->log($this->jiraHookReceiver->error);
         }
+
     }
 
     /** Gets channel by Jira Project key
@@ -84,7 +92,7 @@ class JiraSlackIntegration {
     protected function log($message)
     {
         $date=date('d.m.Y H:i:s');
-        file_put_contents($this->logfile, "[".$date."] ".$message."\n");//, FILE_APPEND);
+        file_put_contents($this->logfile, "[".$date."] ".$message."\n", FILE_APPEND);
     }
 
     /*

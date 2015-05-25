@@ -5,6 +5,8 @@ namespace classes\Slack;
 
 class SlackWebhookSender {
 
+    public $error='';
+
     protected $slackHookUrl;
 
     public function __construct($slackHookUrl)
@@ -20,11 +22,22 @@ class SlackWebhookSender {
 		    "text": "'.$text.'",
 		    '.$parameters.'
         }';
-        if($this->sendRequest($slack_request))
+        $answer=$this->sendRequest($slack_request);
+        switch($answer)
         {
-            return true;
+            case 'ok':
+                $this->error='';
+                return true;
 
-        } else return false;
+            case false:
+                $this->error='Cannot init curl session!';
+                return false;
+
+            default:
+                $this->error=$answer;
+                return false;
+
+        }
     }
 
     public function sendToChannel($channel, $from,  $text, $parameters=false)
@@ -36,11 +49,22 @@ class SlackWebhookSender {
 		    "text": "'.$text.'",
 		    '.$parameters.'
         }';
-        if($this->sendRequest($slack_request))
+        $answer=$this->sendRequest($slack_request);
+        switch($answer)
         {
-            return true;
+            case 'ok':
+                $this->error='';
+                return true;
 
-        } else return false;
+            case false:
+                $this->error='Cannot init curl session!';
+                return false;
+
+            default:
+                $this->error=$answer;
+                return false;
+
+        }
     }
 
     protected function sendRequest($slack_request)
