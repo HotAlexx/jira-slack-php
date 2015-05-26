@@ -123,6 +123,10 @@ class JiraSlackIntegration {
             return false;
     }
 
+    /** Check new assign
+     * @param $data
+     * @return bool|string User or false when not assigned
+     */
     protected function isNewAssign($data)
     {
         $assignee_key='';
@@ -151,14 +155,6 @@ class JiraSlackIntegration {
         $date=date('d.m.Y H:i:s');
         file_put_contents($this->logfile, "[".$date."] ".$message."\n", FILE_APPEND);
     }
-/*
-    protected function getDump($var)
-    {
-        ob_start();
-        var_dump($var);
-        return ob_get_clean();
-    }
-*/
 
     /** Template for create issue event
      * @param $data Jira Hook data
@@ -215,6 +211,10 @@ class JiraSlackIntegration {
                 ]';
     }
 
+    /** Template for user assign message
+     * @param $data
+     * @return string
+     */
     protected function templateAssign($data)
     {
         $pretext="<https://plusonedev.atlassian.net/secure/ViewProfile.jspa?name=".$data->user->key."|".$data->user->displayName."> assigned to you a ".$data->issue->fields->issuetype->name." <https://plusonedev.atlassian.net/browse/".$data->issue->key."|".$data->issue->key.">";
@@ -246,6 +246,9 @@ class JiraSlackIntegration {
         foreach($changelog as $item)
         {
             if($fields != '') $fields.=', ';
+
+            $item=$this->formattingChangelogItem($item);
+
             $fields.='{
                         "title": "'.$item->field.'",
                         "value": "'.$item->fromString.' -> '.$item->toString.'",
@@ -262,5 +265,36 @@ class JiraSlackIntegration {
                             ]
                         }
                 ]';
+    }
+
+    /** Formatting changelog items fields
+     * @param $item
+     * @return mixed
+     */
+    protected function formattingChangelogItem($item)
+    {
+        // Time formatting
+        if($item->field == 'timeestimate' || $item->field == 'timespent' || $item->field == 'timeoriginalestimate')
+        {
+            $item->fromString=$this->timeFormat($item->fromString);
+            $item->toString=$this->timeFormat($item->toString);
+        }
+
+        return $item;
+
+    }
+
+    /** Time formatting
+     * @param $seconds Time in seconds
+     * @return string Time in '*h *m' format
+     */
+    protected function timeFormat($seconds)
+    {
+        $hours=floor($seconds / 3600);
+        $minutes=floor(($seconds-($hours*3600)) / 60);
+
+        $timeformat=$hours.'h '.($minutes ? $minutes.'m' : '');
+
+        return $timeformat;
     }
 } 

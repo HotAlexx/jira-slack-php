@@ -14,6 +14,13 @@ class SlackWebhookSender {
         $this->slackHookUrl = $slackHookUrl;
     }
 
+    /** Sends direct message to slack user
+     * @param $user
+     * @param $from
+     * @param $text
+     * @param bool $parameters
+     * @return bool
+     */
     public function directMessage($user, $from, $text, $parameters=false)
     {
         $slack_request='{
@@ -40,6 +47,13 @@ class SlackWebhookSender {
         }
     }
 
+    /** Sends message to channel
+     * @param $channel
+     * @param $from
+     * @param $text
+     * @param bool $parameters
+     * @return bool
+     */
     public function sendToChannel($channel, $from,  $text, $parameters=false)
     {
         if($channel) $channel_string='"channel": "#'.$channel.'",'; else $channel_string='';
@@ -67,6 +81,10 @@ class SlackWebhookSender {
         }
     }
 
+    /** Sends request to Slack
+     * @param $slack_request
+     * @return bool|mixed
+     */
     protected function sendRequest($slack_request)
     {
         if( $curl = curl_init() ) {

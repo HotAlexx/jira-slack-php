@@ -9,6 +9,9 @@ class JiraHookReceiver {
     public $data;
     public $error;
 
+    /** Gets data form Jira hook request
+     * @return bool
+     */
     public function getData()
     {
         $f = fopen('php://input', 'r');
