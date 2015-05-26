@@ -11,38 +11,23 @@ use classes\Slack\SlackWebhookSender;
 
 class JiraSlackIntegration {
 
-    public $slackHookUrl='https://hooks.slack.com/services/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';
+    public $slackHookUrl='{Your slack incoming hook URL}';
     public $jiraHookReceiver;
 
     /**
      * @var array Channels mapping
      */
     public $projectsToChannels=array(
-        'CUR' => 'cursolog',
-        'SMAR' => 'navigator',
-        'SITES' => 'sites',
-        'CMS' => 'cms',
-        'FCRM' => 'fin_crm',
-        'RAZ' => 'raz',
+        'JIRA-PROJECT-KEY1' => 'slack-channel1',
+        'JIRA-PROJECT-KEY2' => 'slack-channel2',
     );
 
     /**
      * @var array Users mapping
      */
     public $jiraUsersToSlack=array(
-        'admin' => 'hotalex',
-        'dimon9107' => 'dvm',
-        'alexeyshim' => 'alexeyshim',
-        'eremin' => 'eremin',
-        'kovalev' => 'kovalev',
-        'andrei.kalachev' => 'kalachev',
-        'helgaselivers' => 'helgaselivers',
-        'juliapo' => 'juliapo',
-        'pbalin' => 'pbalin',
-        'rash012' => 'rash012',
-        'yana-bony' => 'yana',
-        'Ymka' => 'ymka',
-        'xpasha' => 'khramkin',
+        'jira-user-key1' => 'slack-user1',
+        'jira-user-key2' => 'slack-user2',
     );
 
     /**
