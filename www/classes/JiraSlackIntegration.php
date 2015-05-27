@@ -69,15 +69,15 @@ class JiraSlackIntegration {
             {
                 case 'jira:issue_created':
                     if(!$slaskWebhookSender->sendToChannel($channel, 'jira-updates', '', $this->templateIssueCreated($this->jiraHookReceiver->data)))
-                    {$this->log($slaskWebhookSender->error);$this->log($this->getDump($this->templateIssueCreated($this->jiraHookReceiver->data)));}
+                        $this->log($slaskWebhookSender->error);
                     break;
                 case 'jira:issue_deleted':
                     if(!$slaskWebhookSender->sendToChannel($channel, 'jira-updates', '', $this->templateIssueDeleted($this->jiraHookReceiver->data)))
-                    {$this->log($slaskWebhookSender->error);$this->log($this->getDump($this->templateIssueDeleted($this->jiraHookReceiver->data)));}
+                        $this->log($slaskWebhookSender->error);
                     break;
                 default:
                     if(!$slaskWebhookSender->sendToChannel($channel, 'jira-updates', '', $this->templateIssueUpdated($this->jiraHookReceiver->data)))
-                    {$this->log($slaskWebhookSender->error);$this->log($this->getDump($this->templateIssueUpdated($this->jiraHookReceiver->data)));}
+                        $this->log($slaskWebhookSender->error);
 
             }
 
@@ -87,7 +87,7 @@ class JiraSlackIntegration {
             if($new_assign_jirauser && $slackUser=$this->getDestinationUser($new_assign_jirauser))
             {
                 if(!$slaskWebhookSender->directMessage($slackUser, 'jira-updates', '', $this->templateAssign($this->jiraHookReceiver->data)))
-                {$this->log($slaskWebhookSender->error);$this->log($this->getDump($this->templateAssign($this->jiraHookReceiver->data)));}
+                    $this->log($slaskWebhookSender->error);
             }
 
 
@@ -99,14 +99,6 @@ class JiraSlackIntegration {
 
     }
 
-    protected function getDump($var)
-    {
-        ob_start();
-        var_dump($var);
-        $result = ob_get_clean();
-
-        return $result;
-    }
 
     /**
      * @param $project_key
