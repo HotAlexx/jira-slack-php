@@ -41,7 +41,7 @@ class JiraSlackIntegration {
         'pbalin' => 'pbalin',
         'rash012' => 'rash012',
         'yana-bony' => 'yana',
-        'Ymka' => 'ymka',
+        'ymka' => 'ymka',
         'xpasha' => 'khramkin',
     );
 
@@ -69,15 +69,15 @@ class JiraSlackIntegration {
             {
                 case 'jira:issue_created':
                     if(!$slaskWebhookSender->sendToChannel($channel, 'jira-updates', '', $this->templateIssueCreated($this->jiraHookReceiver->data)))
-                        $this->log($slaskWebhookSender->error);
+                    {$this->log($slaskWebhookSender->error);$this->log($this->getDump($this->templateIssueCreated($this->jiraHookReceiver->data)));}
                     break;
                 case 'jira:issue_deleted':
                     if(!$slaskWebhookSender->sendToChannel($channel, 'jira-updates', '', $this->templateIssueDeleted($this->jiraHookReceiver->data)))
-                        $this->log($slaskWebhookSender->error);
+                    {$this->log($slaskWebhookSender->error);$this->log($this->getDump($this->templateIssueDeleted($this->jiraHookReceiver->data)));}
                     break;
                 default:
                     if(!$slaskWebhookSender->sendToChannel($channel, 'jira-updates', '', $this->templateIssueUpdated($this->jiraHookReceiver->data)))
-                        $this->log($slaskWebhookSender->error);
+                    {$this->log($slaskWebhookSender->error);$this->log($this->getDump($this->templateIssueUpdated($this->jiraHookReceiver->data)));}
 
             }
 
@@ -87,7 +87,7 @@ class JiraSlackIntegration {
             if($new_assign_jirauser && $slackUser=$this->getDestinationUser($new_assign_jirauser))
             {
                 if(!$slaskWebhookSender->directMessage($slackUser, 'jira-updates', '', $this->templateAssign($this->jiraHookReceiver->data)))
-                    $this->log($slaskWebhookSender->error);
+                {$this->log($slaskWebhookSender->error);$this->log($this->getDump($this->templateAssign($this->jiraHookReceiver->data)));}
             }
 
 
@@ -97,6 +97,15 @@ class JiraSlackIntegration {
             $this->log($this->jiraHookReceiver->error);
         }
 
+    }
+
+    protected function getDump($var)
+    {
+        ob_start();
+        var_dump($var);
+        $result = ob_get_clean();
+
+        return $result;
     }
 
     /**
@@ -279,6 +288,8 @@ class JiraSlackIntegration {
             $item->fromString=$this->timeFormat($item->fromString);
             $item->toString=$this->timeFormat($item->toString);
         }
+        $item->fromString=strip_tags(addslashes(str_replace(array("\r\n", "\r", "\n", "&", "'"), '', $item->fromString)));
+        $item->toString=strip_tags(addslashes(str_replace(array("\r\n", "\r", "\n", "&", "'"), '', $item->toString)));
 
         return $item;
 
