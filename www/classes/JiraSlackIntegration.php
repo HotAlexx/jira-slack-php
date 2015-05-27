@@ -12,6 +12,7 @@ use classes\Slack\SlackWebhookSender;
 class JiraSlackIntegration {
 
     public $slackHookUrl='{Your slack incoming hook URL}';
+
     public $jiraHookReceiver;
 
     /**
@@ -20,6 +21,7 @@ class JiraSlackIntegration {
     public $projectsToChannels=array(
         'JIRA-PROJECT-KEY1' => 'slack-channel1',
         'JIRA-PROJECT-KEY2' => 'slack-channel2',
+
     );
 
     /**
@@ -264,6 +266,9 @@ class JiraSlackIntegration {
             $item->fromString=$this->timeFormat($item->fromString);
             $item->toString=$this->timeFormat($item->toString);
         }
+
+        $item->fromString=strip_tags(addslashes(str_replace(array("\r\n", "\r", "\n", "&", "'"), '', $item->fromString)));
+        $item->toString=strip_tags(addslashes(str_replace(array("\r\n", "\r", "\n", "&", "'"), '', $item->toString)));
 
         return $item;
 
