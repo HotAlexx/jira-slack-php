@@ -1,5 +1,5 @@
 # jira-slack-php
-Jira-Slack integrator on php
+Jira-Slack integrator in php
 
 # Features
 
