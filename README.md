@@ -14,5 +14,6 @@ Jira-Slack integrator in php
 - Set your host DocumentRoot into www directory
 - Create a directory for log file (default - www/logs) and set it write permissions
 - Add Slack incoming Hook integration and put URL into JiraSlackIntegration class config (line 14)
+- Put Jira URL into JiraSlackIntegration class config (line 15)
 - Add Jira hook with your host URL
 - Set $projectsToChannels and $jiraUsersToSlack settings in JiraSlackIntegration class
