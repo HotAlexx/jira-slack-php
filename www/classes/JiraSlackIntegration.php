@@ -12,6 +12,7 @@ use classes\Slack\SlackWebhookSender;
 class JiraSlackIntegration {
 
     public $slackHookUrl='https://hooks.slack.com/services/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';
+	public $jiraUrl='https://plusonedev.atlassian.net';
     public $jiraHookReceiver;
 
     /**
@@ -24,6 +25,7 @@ class JiraSlackIntegration {
         'CMS' => 'cms',
         'FCRM' => 'fin_crm',
         'RAZ' => 'raz',
+		'STRK' => 'santrek',
     );
 
     /**
@@ -163,7 +165,7 @@ class JiraSlackIntegration {
      */
     protected function templateIssueCreated($data)
     {
-        $pretext="<https://plusonedev.atlassian.net/secure/ViewProfile.jspa?name=".$data->user->key."|".$data->user->displayName."> created a ".$data->issue->fields->issuetype->name." <https://plusonedev.atlassian.net/browse/".$data->issue->key."|".$data->issue->key.">";
+        $pretext="<".$this->jiraUrl."/secure/ViewProfile.jspa?name=".$data->user->key."|".$data->user->displayName."> created a ".$data->issue->fields->issuetype->name." <".$this->jiraUrl."/browse/".$data->issue->key."|".$data->issue->key.">";
         if($data->issue->fields->assignee)
             $assignee_field=',{
                                     "title": "Assignee",
@@ -195,7 +197,7 @@ class JiraSlackIntegration {
      */
     protected function templateIssueDeleted($data)
     {
-        $pretext="<https://plusonedev.atlassian.net/secure/ViewProfile.jspa?name=".$data->user->key."|".$data->user->displayName."> deleted a ".$data->issue->fields->issuetype->name." <https://plusonedev.atlassian.net/browse/".$data->issue->key."|".$data->issue->key.">";
+        $pretext="<".$this->jiraUrl."/secure/ViewProfile.jspa?name=".$data->user->key."|".$data->user->displayName."> deleted a ".$data->issue->fields->issuetype->name." <".$this->jiraUrl."/browse/".$data->issue->key."|".$data->issue->key.">";
 
         return '"attachments": [
                         {
@@ -218,7 +220,7 @@ class JiraSlackIntegration {
      */
     protected function templateAssign($data)
     {
-        $pretext="<https://plusonedev.atlassian.net/secure/ViewProfile.jspa?name=".$data->user->key."|".$data->user->displayName."> assigned to you a ".$data->issue->fields->issuetype->name." <https://plusonedev.atlassian.net/browse/".$data->issue->key."|".$data->issue->key.">";
+        $pretext="<".$this->jiraUrl."/secure/ViewProfile.jspa?name=".$data->user->key."|".$data->user->displayName."> assigned to you a ".$data->issue->fields->issuetype->name." <".$this->jiraUrl."/browse/".$data->issue->key."|".$data->issue->key.">";
 
         return '"attachments": [
                         {
@@ -241,7 +243,7 @@ class JiraSlackIntegration {
      */
     protected function templateIssueUpdated($data)
     {
-        $pretext=$data->issue->fields->issuetype->name." <https://plusonedev.atlassian.net/browse/".$data->issue->key."|".$data->issue->key."> is updated by <https://plusonedev.atlassian.net/secure/ViewProfile.jspa?name=".$data->user->key."|".$data->user->displayName.">";
+        $pretext=$data->issue->fields->issuetype->name." <".$this->jiraUrl."/browse/".$data->issue->key."|".$data->issue->key."> is updated by <".$this->jiraUrl."/secure/ViewProfile.jspa?name=".$data->user->key."|".$data->user->displayName.">";
         $changelog=$data->changelog->items;
         $fields='';
         foreach($changelog as $item)
